@@ -1,0 +1,20 @@
+introduction
+list out all the performance metrices or whatever you want to achieve(aim to extract from this report)
+sample queries and all output print screens
+design issue and challenges you want to discuss
+conclusion 
+
+
+1. how many jobs started/ended from time A to time B?
+2. how many total jobs been executed on machine or by machine?(allocated)
+-according to month
+3. how many user submit most of the job?
+4. how many jobs did not complete because of error?
+5. what are the error happened within these X and Y duration?
+   error caused by which user?
+6.by partition
+(what is usage from where to where)
+(how many per partition?)
+5. total number of average failure on which machine
+
+
