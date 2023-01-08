@@ -9,10 +9,10 @@ import java.util.Scanner;
 public class LogReader {
     public static void main(String[] args) {
 
-        countTypeOfJob("extracted_log");
+        categorizeJobTypes("extracted_log");
     }
 
-    public static void countTypeOfJob(String filename) {
+    public static void categorizeJobTypes(String filename) {
         String jobTypeFilepath = "./Outputs/job_types.txt";
 
         createFile(jobTypeFilepath);
