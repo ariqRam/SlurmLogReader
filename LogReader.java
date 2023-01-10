@@ -6,7 +6,6 @@ import java.io.FileReader;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Arrays;
 import java.util.Scanner;
 
 public class LogReader {
@@ -14,10 +13,81 @@ public class LogReader {
 
         // categorizeJobTypes("extracted_log");
         // createJobTable("extracted_log");
-        getMonthlyJobCreated("extracted_log");
+        // getMonthlyJobCreated("extracted_log"); // barchart-able
+        getJobTimeRange("extracted_log");
     }
 
-    public static void getMonthlyJobCreated(String filename) {
+    public static String parseTime(String date) {
+        if(date.compareTo("-") == 0) {
+            return date;
+        }
+
+        String[] months = {"June", "July", "August", "September", "October", "November", "December"};
+
+        String cleanedDate = date.substring(1, date.length() - 1);
+        String[] splittedDate = cleanedDate.split("T");
+        String[] splittedDay = splittedDate[0].split("-");
+        String month = months[Integer.parseInt(splittedDay[1])-6];
+        String day = splittedDay[2];
+
+
+        String time = splittedDate[1].substring(0,8);
+
+        return String.format("%s | %s/%s", time, day, month);
+    }
+
+    public static void getJobTimeRange(String filename) {
+        try{
+            FileInputStream fis = new FileInputStream(filename);
+            Scanner logSc = new Scanner(fis);
+            while(logSc.hasNextLine()) {
+                String[] splittedLine = logSc.nextLine().split(" ");
+                String jobType = splittedLine[1];
+                String date = splittedLine[0];
+                if(jobType.compareTo("sched:") == 0 && splittedLine[2].compareTo("Allocate") == 0) {
+                    int jobId = Integer.parseInt(splittedLine[3].split("=")[1]);
+                    String[] wexitStatus = wexitstatusForJobId(jobId, filename);
+                    String startDate = parseTime(date);
+                    String endDate = parseTime(wexitStatus[0]);
+                    System.out.printf("%d %20s %20s %20s\n", jobId, startDate, endDate, wexitStatus[1] );
+                }
+            }
+
+            logSc.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static String[] wexitstatusForJobId(int jobId, String filename) {
+        // use this to help getJobTimeRange
+        
+        try{
+            FileInputStream fis = new FileInputStream(filename);
+            Scanner logSc = new Scanner(fis);
+            while(logSc.hasNextLine()) {
+                String line = logSc.nextLine();
+                String[] splittedLine = line.split(" ");
+                String jobType = splittedLine[1];
+                if(jobType.compareTo("_job_complete:") == 0 && splittedLine[3].compareTo("WEXITSTATUS") == 0) {
+                    int logJobId = Integer.parseInt(splittedLine[2].split("=")[1]);
+                    if(logJobId == jobId) {
+                        logSc.close();
+                        return new String[]{splittedLine[0], splittedLine[4]};
+                    }
+                }
+            }
+
+            logSc.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        //if not found
+        return new String[]{"-", ""};
+    }
+
+    public void getMonthlyJobCreated(String filename) {
 
         int[] monthlyCount = new int[7];
         String[] monthStrings = {"June", "July", "August", "September", "October", "November", "December"};
@@ -26,10 +96,10 @@ public class LogReader {
             FileInputStream fis = new FileInputStream(filename);
             Scanner logSc = new Scanner(fis); 
             while(logSc.hasNextLine()) {
-                String[] line = logSc.nextLine().split(" ");
-                String date = line[0];
+                String[] splittedLine = logSc.nextLine().split(" ");
+                String date = splittedLine[0];
                 int month = Integer.parseInt(date.split("-")[1]);
-                String jobType = line[1];
+                String jobType = splittedLine[1];
 
                 if(jobType.compareTo("sched:") == 0) {
                     monthlyCount[month-6] += 1;
@@ -49,7 +119,7 @@ public class LogReader {
         }
     }
 
-    public static void categorizeJobTypes(String filename) {
+    public void categorizeJobTypes(String filename) {
         String jobTypeFilepath = "./Outputs/job_types.txt";
 
         createFile(jobTypeFilepath);
@@ -109,7 +179,7 @@ public class LogReader {
           }
     }
 
-    public static void createJobTable(String filepath) {
+    public void createJobTable(String filepath) {
         try{
             BufferedReader get = new BufferedReader(new FileReader(filepath));
             
@@ -118,13 +188,12 @@ public class LogReader {
             System.out.println("+----------------------------------------------------------+");
             
             String[]seperate, grab;
-            String line,id=null,node=null, cpu=null, partition=null;
-            int numJobCreated=0;
+            String splittedLine,id=null,node=null, cpu=null, partition=null;
             
-            line = get.readLine();
-            while(line!=null)
+            splittedLine = get.readLine();
+            while(splittedLine!=null)
             {
-                seperate = line.split(" ");
+                seperate = splittedLine.split(" ");
                 if(seperate.length==7 && seperate[2].equals("Allocate"))
                 {   
                          for(int i=3; i<seperate.length;i++)
@@ -145,7 +214,7 @@ public class LogReader {
                         System.out.printf("%-11s%3s%n",partition,"|");
                 }
                   
-                line = get.readLine();
+                splittedLine = get.readLine();
             }
             System.out.println("+----------------------------------------------------------+");
             
