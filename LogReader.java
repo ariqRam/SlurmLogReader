@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Scanner;
+import ErrorByUser.ErrorByUser;
 
 public class LogReader {
     public static void main(String[] args) {
@@ -14,7 +15,8 @@ public class LogReader {
         // categorizeJobTypes("extracted_log");
         // createJobTable("extracted_log");
         // getMonthlyJobCreated("extracted_log"); // barchart-able
-        getJobTimeRange("extracted_log");
+        // getJobTimeRange("extracted_log");
+        ErrorByUser.getErrorByUser();
     }
 
     public static String parseTime(String date) {
@@ -33,13 +35,18 @@ public class LogReader {
 
         String time = splittedDate[1].substring(0,8);
 
-        return String.format("%s | %s/%s", time, day, month);
+        return String.format("%s - %s/%s", time, day, month);
     }
 
     public static void getJobTimeRange(String filename) {
         try{
             FileInputStream fis = new FileInputStream(filename);
             Scanner logSc = new Scanner(fis);
+
+            FileOutputStream fos = new FileOutputStream("./Outputs/job_time_range.txt");
+            PrintWriter output = new PrintWriter(fos);
+            output.printf("%s | %-20s | %-20s | %10s\n", "JobID", "Start Date", "End Date", "Exit Status");
+            output.println("-".repeat(65));
             while(logSc.hasNextLine()) {
                 String[] splittedLine = logSc.nextLine().split(" ");
                 String jobType = splittedLine[1];
@@ -49,10 +56,11 @@ public class LogReader {
                     String[] wexitStatus = wexitstatusForJobId(jobId, filename);
                     String startDate = parseTime(date);
                     String endDate = parseTime(wexitStatus[0]);
-                    System.out.printf("%d %20s %20s %20s\n", jobId, startDate, endDate, wexitStatus[1] );
+                    String newLine = String.format("%d | %20s | %20s | %-10s\n", jobId, startDate, endDate, wexitStatus[1]);
+                    output.print(newLine);
                 }
             }
-
+            output.close();
             logSc.close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -73,7 +81,7 @@ public class LogReader {
                     int logJobId = Integer.parseInt(splittedLine[2].split("=")[1]);
                     if(logJobId == jobId) {
                         logSc.close();
-                        return new String[]{splittedLine[0], splittedLine[4]};
+                        return new String[]{splittedLine[0], "COMPLETED: " + splittedLine[4]};
                     }
                 }
             }
@@ -84,7 +92,7 @@ public class LogReader {
         }
 
         //if not found
-        return new String[]{"-", ""};
+        return new String[]{"-", "FAILED"};
     }
 
     public void getMonthlyJobCreated(String filename) {

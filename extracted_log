@@ -9141,7 +9141,7 @@
 [2022-06-28T12:08:21.039] sched: Allocate JobId=45238 NodeList=cpu11 #CPUs=2 Partition=cpu-opteron
 [2022-06-28T12:08:21.828] _job_complete: JobId=45238 WEXITSTATUS 2
 [2022-06-28T12:08:21.828] _job_complete: JobId=45238 done
-[2022-06-28T12:09:48.763] _slurm_rpc_submit_batch_job: JobId=  InitPrio=21078 usec=365
+[2022-06-28T12:09:48.763] _slurm_rpc_submit_batch_job: JobId=45239 InitPrio=21078 usec=365
 [2022-06-28T12:09:49.518] sched/backfill: _start_job: Started JobId=45239 in cpu-opteron on cpu11
 [2022-06-28T12:09:50.302] _job_complete: JobId=45239 WEXITSTATUS 2
 [2022-06-28T12:09:50.302] _job_complete: JobId=45239 done

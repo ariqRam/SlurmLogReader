@@ -1,20 +1,18 @@
-
-package assignment.error;
+package ErrorByUser;
 
 import java.util.Arrays;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;                    //represents a mapping between a key and a value
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 
-public class test {
+public class ErrorByUser {
     
-    public static void main(String[]args){    
+    public static void getErrorByUser(){    
         
         //Number of jobs causing error and the corresponding user
         
@@ -76,7 +74,7 @@ public class test {
             
           
            // System.out.println("");
-            System.out.println(Error);
+            // System.out.println(Error);
             
         System.out.println("");   
         System.out.println("The number of jobs causing error : "+ counter);
