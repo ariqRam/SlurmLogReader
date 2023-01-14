@@ -7,7 +7,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Scanner;
-import ErrorByUser.ErrorByUser;
+
+import Extraction.ErrorByUser;
+import Extraction.PartitionUsage;
 
 public class LogReader {
     public static void main(String[] args) {
@@ -16,7 +18,13 @@ public class LogReader {
         // createJobTable("extracted_log");
         // getMonthlyJobCreated("extracted_log"); // barchart-able
         // getJobTimeRange("extracted_log");
-        ErrorByUser.getErrorByUser();
+        // ErrorByUser.getErrorByUser();
+        // PartitionUsage.getJobsByPartition();
+        PartitionUsage.getNodeUsagePerPartition();
+    }
+
+    public static void getUmhpcExecTime(String filename) {
+        
     }
 
     public static String parseTime(String date) {
@@ -45,8 +53,9 @@ public class LogReader {
 
             FileOutputStream fos = new FileOutputStream("./Outputs/job_time_range.txt");
             PrintWriter output = new PrintWriter(fos);
-            output.printf("%s | %-20s | %-20s | %10s\n", "JobID", "Start Date", "End Date", "Exit Status");
-            output.println("-".repeat(65));
+            output.println("+" + "-".repeat(68)+ "+");
+            output.printf("| %s  %20s  %20s  %15s |\n", "JobID", "Start Date", "End Date", "Exit Status");
+            output.println("+" + "-".repeat(68)+ "+");
             while(logSc.hasNextLine()) {
                 String[] splittedLine = logSc.nextLine().split(" ");
                 String jobType = splittedLine[1];
@@ -56,7 +65,7 @@ public class LogReader {
                     String[] wexitStatus = wexitstatusForJobId(jobId, filename);
                     String startDate = parseTime(date);
                     String endDate = parseTime(wexitStatus[0]);
-                    String newLine = String.format("%d | %20s | %20s | %-10s\n", jobId, startDate, endDate, wexitStatus[1]);
+                    String newLine = String.format("| %d  %20s  %20s  %15s |\n", jobId, startDate, endDate, wexitStatus[1]);
                     output.print(newLine);
                 }
             }

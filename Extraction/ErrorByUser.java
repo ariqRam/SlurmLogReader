@@ -1,4 +1,4 @@
-package ErrorByUser;
+package Extraction;
 
 import java.util.Arrays;
 import java.io.BufferedReader;
